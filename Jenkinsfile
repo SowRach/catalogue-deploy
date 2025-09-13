@@ -4,24 +4,22 @@ pipeline {
             label 'Agent'
         }
     }
-    // environment { 
-    //     packageVersion = ''
-    //     nexusURL = '172.31.26.75:8081'
-    // }
+
     options {
         timeout(time: 1, unit: 'HOURS')
         disableConcurrentBuilds()
         ansiColor('xterm')
     }
+
     parameters {
         string(name: 'version', defaultValue: '1.0.0', description: 'What is the artifact version?')
         string(name: 'environment', defaultValue: 'dev', description: 'What is environment?')
-        booleanParam(name: 'Deploy', defaultValue: false, description: 'Toggle this value')
-        // choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
-        // password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
+        booleanParam(name: 'Create', defaultValue: false, description: 'Toggle this value to Create infra')
+        booleanParam(name: 'Destroy', defaultValue: false, description: 'Toggle this value to Destroy infra')
+        choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
+        password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
     }
 
-    // build
     stages {
         stage('Print version') {
             steps {
@@ -32,8 +30,12 @@ pipeline {
             }
         }
 
-
         stage('Init and plan') {
+            when {
+                expression {
+                    params.Create
+                }
+            }
             steps {
                 sh """
                     cd terraform
@@ -43,7 +45,12 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Apply') {
+            when {
+                expression {
+                    params.Create
+                }
+            }
             steps {
                 sh """
                     cd terraform
@@ -51,16 +58,29 @@ pipeline {
                 """
             }
         }
-        
+
+        stage('Destroy') {
+            when {
+                expression {
+                    params.Destroy
+                }
+            }
+            steps {
+                sh """
+                    cd terraform
+                    terraform destroy -var-file=${params.environment}/${params.environment}.tfvars -var="app_version=${params.version}" -auto-approve
+                """
+            }
+        }
     }
 
-    post { 
-        always { 
+    post {
+        always {
             echo 'I will always say Hello again!'
             deleteDir()
         }
-        failure { 
-            echo 'this runs when pipeline is failed, used generally to send some alerts'
+        failure {
+            echo 'This runs when pipeline fails, used generally to send some alerts'
         }
         success {
             echo 'I will say Hello when pipeline is success'
