@@ -1,0 +1,33 @@
+pipeline {
+    agent {
+        node {
+            label 'Agent'
+        }
+    }
+
+    options {
+        timeout(time: 1, unit: 'HOURS')
+        disableConcurrentBuilds()
+    }
+
+    stages {
+        stage('Build-Destroy') {
+            steps {
+                sh """
+                    cd terraform
+                    terraform destroy -var-file=${params.environment}/${params.environment}.tfvars -var="app_version=${params.version}" -auto-approve
+                """
+            }
+        }
+
+        stage('Init and plan') {
+            steps {
+                sh """
+                    cd terraform
+                    terraform init
+                    terraform plan -var-file=${params.environment}/${params.environment}.tfvars -var="app_version=${params.version}"
+                """
+            }
+        }
+    }
+}
