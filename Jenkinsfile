@@ -16,8 +16,8 @@ pipeline {
         string(name: 'environment', defaultValue: 'dev', description: 'What is environment?')
         booleanParam(name: 'Create', defaultValue: false, description: 'Toggle this value to Create infra')
         booleanParam(name: 'Destroy', defaultValue: false, description: 'Toggle this value to Destroy infra')
-        choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
-        password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
+        // choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
+        // password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
     }
 
     stages {
