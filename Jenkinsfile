@@ -35,16 +35,20 @@ pipeline {
 
         stage('Init and plan') {
             steps {
-                cd terraform
-                terraform init --backend-config=${params.environment}/backend.tf -reconfigure
-                terraform plan --backend-config=${params.environment}/backend.tf -reconfigure
+                sh """
+                    cd terraform
+                    terraform init --backend-config=${params.environment}/backend.tf -reconfigure
+                    terraform plan --backend-config=${params.environment}/backend.tf -reconfigure
+                """
             }
         }
 
         stage('Build') {
             steps {
-                cd terraform
-                terraform apply -var-file=${params.environment}/${params.environment}.tfvars -var="app_version=${params.version}" -auto-approve
+                sh """
+                    cd terraform
+                    terraform apply -var-file=${params.environment}/${params.environment}.tfvars -var="app_version=${params.version}" -auto-approve
+                """
             }
         }
         
