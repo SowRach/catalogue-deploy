@@ -14,7 +14,7 @@ pipeline {
         ansiColor('xterm')
     }
     parameters {
-        string(name: 'version', defaultValue: '', description: 'What is the artifact version?')
+        string(name: 'version', defaultValue: '1.0.0', description: 'What is the artifact version?')
         string(name: 'environment', defaultValue: 'dev', description: 'What is environment?')
         booleanParam(name: 'Deploy', defaultValue: false, description: 'Toggle this value')
         // choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
